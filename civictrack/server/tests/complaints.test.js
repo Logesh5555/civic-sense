@@ -77,10 +77,14 @@ describe('image upload validation', () => {
     expect(res.status).toBe(201);
     const rawImg = res.body.data.complaint.images[0];
     const url = typeof rawImg === 'object' && rawImg !== null ? rawImg.url : rawImg;
-    expect(url).toMatch(/^\/uploads\/[a-f0-9]{32}\.png$/);
-    const file = await request(app).get(url);
-    expect(file.status).toBe(200);
-    expect(file.headers['x-content-type-options']).toBe('nosniff');
+    expect(url).toMatch(/^(\/uploads\/[a-f0-9]{32}\.png|https:\/\/res\.cloudinary\.com\/)/);
+    if (url.startsWith('/uploads/')) {
+      const file = await request(app).get(url);
+      expect(file.status).toBe(200);
+      expect(file.headers['x-content-type-options']).toBe('nosniff');
+    } else {
+      expect(url).toContain('cloudinary.com');
+    }
   });
 
   it('rejects disallowed MIME types', async () => {

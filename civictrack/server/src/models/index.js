@@ -45,7 +45,9 @@ const departmentSchema = new Schema(
 const imageSchema = new Schema(
   {
     url: { type: String, required: true },
+    secure_url: { type: String, default: null },
     publicId: { type: String, default: null },
+    public_id: { type: String, default: null },
   },
   { _id: false }
 );
@@ -62,13 +64,20 @@ const complaintSchema = new Schema(
       type: { type: String, enum: ['Point'] },
       coordinates: { type: [Number], default: undefined }, // [longitude, latitude]
     },
+    imageUrl: { type: String, default: null },
     images: {
-      type: [imageSchema],
+      type: [Schema.Types.Mixed],
       set: (val) => {
-        if (Array.isArray(val)) {
-          return val.map((img) => (typeof img === 'string' ? { url: img, publicId: null } : img));
-        }
-        return val;
+        if (!val) return [];
+        if (!Array.isArray(val)) val = [val];
+        return val.map((img) => {
+          if (typeof img === 'string') {
+            return { url: img, secure_url: img, publicId: null, public_id: null };
+          }
+          const u = img?.url || img?.secure_url || '';
+          const p = img?.publicId || img?.public_id || null;
+          return { url: u, secure_url: u, publicId: p, public_id: p };
+        });
       },
       default: [],
     },
@@ -99,7 +108,13 @@ const complaintSchema = new Schema(
     resolutionDetails: { type: String, maxlength: 2000 },
     resolutionImage: {
       type: Schema.Types.Mixed,
-      set: (val) => (typeof val === 'string' ? { url: val, publicId: null } : val),
+      set: (val) => {
+        if (!val) return null;
+        if (typeof val === 'string') return { url: val, secure_url: val, publicId: null, public_id: null };
+        const u = val.url || val.secure_url || '';
+        const p = val.publicId || val.public_id || null;
+        return { url: u, secure_url: u, publicId: p, public_id: p };
+      },
       default: null,
     },
     resolvedAt: { type: Date },
@@ -108,23 +123,55 @@ const complaintSchema = new Schema(
   { timestamps: true }
 );
 
-// Backward-compatible hook: seamlessly cast string image paths to { url, publicId: null }
+// Backward-compatible hook: seamlessly populate imageUrl and normalize image paths
 complaintSchema.pre('validate', function (next) {
-  if (Array.isArray(this.images)) {
-    this.images = this.images.map((img) => (typeof img === 'string' ? { url: img, publicId: null } : img));
+  if (Array.isArray(this.images) && this.images.length > 0) {
+    this.images = this.images.map((img) => {
+      if (typeof img === 'string') {
+        return { url: img, secure_url: img, publicId: null, public_id: null };
+      }
+      const u = img?.url || img?.secure_url || '';
+      const p = img?.publicId || img?.public_id || null;
+      return { url: u, secure_url: u, publicId: p, public_id: p };
+    });
+    const firstUrl = this.images[0]?.url || this.images[0]?.secure_url;
+    if (firstUrl) {
+      this.imageUrl = firstUrl;
+    }
+  } else if (this.imageUrl) {
+    this.images = [{ url: this.imageUrl, secure_url: this.imageUrl, publicId: null, public_id: null }];
   }
   if (typeof this.resolutionImage === 'string') {
-    this.resolutionImage = { url: this.resolutionImage, publicId: null };
+    this.resolutionImage = { url: this.resolutionImage, secure_url: this.resolutionImage, publicId: null, public_id: null };
+  } else if (this.resolutionImage && typeof this.resolutionImage === 'object') {
+    const ru = this.resolutionImage.url || this.resolutionImage.secure_url;
+    const rp = this.resolutionImage.publicId || this.resolutionImage.public_id || null;
+    this.resolutionImage.url = ru;
+    this.resolutionImage.secure_url = ru;
+    this.resolutionImage.publicId = rp;
+    this.resolutionImage.public_id = rp;
   }
   next();
 });
 
 complaintSchema.post('init', function (doc) {
-  if (Array.isArray(doc.images)) {
-    doc.images = doc.images.map((img) => (typeof img === 'string' ? { url: img, publicId: null } : img));
+  if (Array.isArray(doc.images) && doc.images.length > 0) {
+    doc.images = doc.images.map((img) => {
+      if (typeof img === 'string') {
+        return { url: img, secure_url: img, publicId: null, public_id: null };
+      }
+      const u = img?.url || img?.secure_url || '';
+      const p = img?.publicId || img?.public_id || null;
+      return { url: u, secure_url: u, publicId: p, public_id: p };
+    });
+    if (!doc.imageUrl) {
+      doc.imageUrl = doc.images[0]?.url || doc.images[0]?.secure_url || null;
+    }
+  } else if (doc.imageUrl && (!doc.images || doc.images.length === 0)) {
+    doc.images = [{ url: doc.imageUrl, secure_url: doc.imageUrl, publicId: null, public_id: null }];
   }
   if (typeof doc.resolutionImage === 'string') {
-    doc.resolutionImage = { url: doc.resolutionImage, publicId: null };
+    doc.resolutionImage = { url: doc.resolutionImage, secure_url: doc.resolutionImage, publicId: null, public_id: null };
   }
 });
 complaintSchema.index({ location: '2dsphere' }, { sparse: true });

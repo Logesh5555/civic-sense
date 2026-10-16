@@ -45,7 +45,9 @@ export const createComplaintSchema = z.object({
   locationDescription: text(3, 300, 'Location description'),
   latitude: optionalNum(-90, 90, 'Latitude'),
   longitude: optionalNum(-180, 180, 'Longitude'),
-}).refine((d) => (d.latitude === undefined) === (d.longitude === undefined), { message: 'Provide both latitude and longitude, or neither', path: ['latitude'] });
+  imageUrl: z.string().optional(),
+  images: z.any().optional(),
+}).passthrough().refine((d) => (d.latitude === undefined) === (d.longitude === undefined), { message: 'Provide both latitude and longitude, or neither', path: ['latitude'] });
 
 export const updateComplaintSchema = z.object({
   title: text(5, 120, 'Title').optional(),

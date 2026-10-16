@@ -59,10 +59,22 @@ export function serializeComplaint(c, user) {
   o.id = String(o._id);
   delete o.__v;
   if (Array.isArray(o.images)) {
-    o.images = o.images.map((img) => (typeof img === 'string' ? { url: img, publicId: null } : img));
+    o.images = o.images.map((img) => {
+      if (typeof img === 'string') {
+        return { url: img, secure_url: img, publicId: null, public_id: null };
+      }
+      const u = img?.url || img?.secure_url || '';
+      const p = img?.publicId || img?.public_id || null;
+      return { url: u, secure_url: u, publicId: p, public_id: p };
+    });
   }
+  o.imageUrl = o.imageUrl || o.images?.[0]?.url || o.images?.[0]?.secure_url || null;
   if (typeof o.resolutionImage === 'string') {
-    o.resolutionImage = { url: o.resolutionImage, publicId: null };
+    o.resolutionImage = { url: o.resolutionImage, secure_url: o.resolutionImage, publicId: null, public_id: null };
+  } else if (o.resolutionImage && typeof o.resolutionImage === 'object') {
+    const ru = o.resolutionImage.url || o.resolutionImage.secure_url;
+    const rp = o.resolutionImage.publicId || o.resolutionImage.public_id || null;
+    o.resolutionImage = { url: ru, secure_url: ru, publicId: rp, public_id: rp };
   }
   if (!user || user.role === 'citizen') {
     delete o.internalNotes; delete o.duplicateOf; delete o.suggestedPriority;
@@ -74,12 +86,14 @@ export function serializeComplaint(c, user) {
 
 /** Limited, non-personal view for public reference tracking. */
 export function serializePublic(c) {
-  const images = (c.images || []).map((img) => (typeof img === 'string' ? img : img.url));
-  const resImg = c.resolutionImage ? (typeof c.resolutionImage === 'string' ? c.resolutionImage : c.resolutionImage.url) : null;
+  const images = (c.images || []).map((img) => (typeof img === 'string' ? img : (img.url || img.secure_url)));
+  const primaryUrl = c.imageUrl || images[0] || null;
+  const resImg = c.resolutionImage ? (typeof c.resolutionImage === 'string' ? c.resolutionImage : (c.resolutionImage.url || c.resolutionImage.secure_url)) : null;
   return {
     referenceNumber: c.referenceNumber, title: c.title, category: c.category, status: c.status,
     createdAt: c.createdAt, resolvedAt: c.resolvedAt,
     images,
+    imageUrl: primaryUrl,
     resolutionImage: resImg,
     department: c.assignedDepartmentId?.name || null,
     timeline: c.statusHistory.map((h) => ({ to: h.to, at: h.at })),

@@ -38,7 +38,7 @@ export async function start(uri = config.mongoUri) {
     throw err;
   }
   const app = createApp();
-  return app.listen(config.port, () => console.log(`CivicTrack API listening on :${config.port} (${config.env})`));
+  return app.listen(config.port, '0.0.0.0', () => console.log(`CivicTrack API listening on http://127.0.0.1:${config.port} (${config.env})`));
 }
 
 // Only auto-start when executed directly (not when imported by scripts/tests).

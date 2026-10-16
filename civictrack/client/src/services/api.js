@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-export const api = axios.create({ baseURL: '/api', withCredentials: true, timeout: 20000 });
+const rawBase = import.meta.env.VITE_API_URL || '/api';
+const baseURL = rawBase.endsWith('/') ? rawBase.slice(0, -1) : rawBase;
+export const api = axios.create({ baseURL, withCredentials: true, timeout: 20000 });
 
 /** Normalizes API failures into { message, details, status }. */
 export function parseError(err) {

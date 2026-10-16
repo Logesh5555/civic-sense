@@ -61,7 +61,9 @@ export function uploadToCloudinary(buffer, options = {}) {
       }
       resolve({
         url: result.secure_url,
+        secure_url: result.secure_url,
         publicId: result.public_id,
+        public_id: result.public_id,
         format: result.format,
         bytes: result.bytes,
         width: result.width,

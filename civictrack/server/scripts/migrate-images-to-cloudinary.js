@@ -80,10 +80,14 @@ export async function migrateImagesToCloudinary({ dryRun = false, log = console.
             const uploadRes = await uploadToCloudinary(buffer, {
               folder: config.cloudinary.folder,
             });
-            log(`    -> [✓] Uploaded to Cloudinary: ${uploadRes.secure_url}`);
+            const imgUrl = uploadRes.secure_url || uploadRes.url;
+            const imgPid = uploadRes.public_id || uploadRes.publicId;
+            log(`    -> [✓] Uploaded to Cloudinary: ${imgUrl}`);
             updatedImages.push({
-              url: uploadRes.secure_url,
-              publicId: uploadRes.public_id,
+              url: imgUrl,
+              secure_url: imgUrl,
+              publicId: imgPid,
+              public_id: imgPid,
             });
             migratedImagesCount++;
             modified = true;
@@ -97,6 +101,9 @@ export async function migrateImagesToCloudinary({ dryRun = false, log = console.
 
       if (modified) {
         comp.images = updatedImages;
+        if (updatedImages.length > 0) {
+          comp.imageUrl = updatedImages[0].url || updatedImages[0].secure_url;
+        }
       }
     }
 
@@ -126,9 +133,13 @@ export async function migrateImagesToCloudinary({ dryRun = false, log = console.
                   folder: `${config.cloudinary.folder}/resolutions`,
                 });
                 log(`    -> [✓] Uploaded resolution image: ${uploadRes.secure_url}`);
+                const resImgUrl = uploadRes.secure_url || uploadRes.url;
+                const resImgPid = uploadRes.public_id || uploadRes.publicId;
                 comp.resolutionImage = {
-                  url: uploadRes.secure_url,
-                  publicId: uploadRes.public_id,
+                  url: resImgUrl,
+                  secure_url: resImgUrl,
+                  publicId: resImgPid,
+                  public_id: resImgPid,
                 };
                 migratedImagesCount++;
                 modified = true;

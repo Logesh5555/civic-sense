@@ -52,15 +52,28 @@ const LIST_SELECT = '-internalNotes -statusHistory -citizenVisibleUpdates -descr
 export const createComplaint = asyncHandler(async (req, res) => {
   const { latitude, longitude, ...rest } = req.body;
   const suggested = suggestPriority(rest.category);
+
+  const images = (req.uploadedImages && req.uploadedImages.length > 0)
+    ? req.uploadedImages
+    : (Array.isArray(req.body.images) && req.body.images.length > 0
+      ? req.body.images
+      : (req.body.imageUrl ? [{ url: req.body.imageUrl, secure_url: req.body.imageUrl, publicId: null, public_id: null }] : []));
+
+  const imageUrl = images?.[0]?.url || images?.[0]?.secure_url || req.body.imageUrl || null;
+
   let complaint;
   try {
     complaint = await Complaint.create({
       ...rest,
       referenceNumber: await nextReferenceNumber(),
       citizenId: req.user._id, // from session only
-      images: req.uploadedImages || [],
+      images,
+      imageUrl,
+      status: 'submitted',
       priority: suggested,
       suggestedPriority: suggested,
+      assignedDepartmentId: null,
+      assignedStaffId: null,
       ...(latitude !== undefined ? { location: { type: 'Point', coordinates: [longitude, latitude] } } : {}),
       statusHistory: [{ from: null, to: 'submitted', actorId: req.user._id, actorName: req.user.name }],
     });
@@ -68,7 +81,8 @@ export const createComplaint = asyncHandler(async (req, res) => {
     // If database save fails, clean up any uploaded Cloudinary assets to avoid orphaned files
     if (Array.isArray(req.uploadedImages)) {
       for (const img of req.uploadedImages) {
-        if (img?.publicId) deleteUploadedImage(img.publicId).catch(() => {});
+        const pid = img?.publicId || img?.public_id;
+        if (pid) deleteUploadedImage(pid).catch(() => {});
       }
     }
     throw err;

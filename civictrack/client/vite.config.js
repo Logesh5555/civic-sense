@@ -7,8 +7,14 @@ export default defineConfig({
     port: 5173,
     // Same-origin in dev so the HttpOnly cookie works without CORS hassles.
     proxy: {
-      '/api': 'http://localhost:5000',
-      '/uploads': 'http://localhost:5000',
+      '/api': {
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true,
+      },
+      '/uploads': {
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true,
+      },
     },
   },
   build: {

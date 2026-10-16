@@ -24,9 +24,12 @@ const localDriver = {
     const full = path.join(config.uploadDir, name);
     if (path.dirname(full) !== config.uploadDir) throw new AppError(400, 'Invalid file path');
     await fs.writeFile(full, buffer, { flag: 'wx', mode: 0o644 });
+    const localUrl = `/uploads/${name}`;
     return {
-      url: `/uploads/${name}`,
+      url: localUrl,
+      secure_url: localUrl,
       publicId: `local_${name}`,
+      public_id: `local_${name}`,
     };
   },
   async deleteImage(publicId) {
@@ -47,9 +50,13 @@ const localDriver = {
 const cloudinaryDriver = {
   async saveImage(buffer, ext, options) {
     const res = await uploadToCloudinary(buffer, options);
+    const u = res.secure_url || res.url;
+    const p = res.public_id || res.publicId;
     return {
-      url: res.url,
-      publicId: res.publicId,
+      url: u,
+      secure_url: u,
+      publicId: p,
+      public_id: p,
     };
   },
   async deleteImage(publicId) {
@@ -101,8 +108,10 @@ export async function storeValidatedImage(file, options = {}) {
  */
 export async function deleteUploadedImage(publicId) {
   if (!publicId) return;
-  if (publicId.startsWith('local_')) {
-    return localDriver.deleteImage(publicId);
+  const id = typeof publicId === 'object' ? (publicId.publicId || publicId.public_id) : publicId;
+  if (!id || typeof id !== 'string') return;
+  if (id.startsWith('local_')) {
+    return localDriver.deleteImage(id);
   }
-  return cloudinaryDriver.deleteImage(publicId);
+  return cloudinaryDriver.deleteImage(id);
 }

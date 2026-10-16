@@ -1,7 +1,14 @@
 {
   "name": "civic-sense-root",
   "private": true,
+  "workspaces": [
+    "civictrack",
+    "civictrack/client",
+    "civictrack/server"
+  ],
   "scripts": {
+    "build": "npm --prefix civictrack run build",
+    "build:client": "npm --prefix civictrack/client run build",
     "dev:server": "npm --prefix civictrack run dev:server",
     "dev:server:memory": "npm --prefix civictrack run dev:server:memory",
     "dev:client": "npm --prefix civictrack run dev:client",

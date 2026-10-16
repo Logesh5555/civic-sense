@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { detectImageType, deleteUploadedImage } from '../src/services/storage.js';
 import { assertCloudinaryConfig } from '../src/config/cloudinary.js';
+import { config } from '../src/config/index.js';
 import { Complaint } from '../src/models/index.js';
 import { PNG, startDb, stopDb } from './helpers.js';
 
@@ -42,8 +43,14 @@ describe('Cloudinary & Storage Service', () => {
   });
 
   describe('assertCloudinaryConfig validation', () => {
-    it('throws error when Cloudinary configuration is missing in test env', () => {
-      expect(() => assertCloudinaryConfig()).toThrow(/Cloudinary configuration incomplete/);
+    it('throws error when Cloudinary configuration is missing', () => {
+      const orig = config.cloudinary.cloudName;
+      config.cloudinary.cloudName = '';
+      try {
+        expect(() => assertCloudinaryConfig()).toThrow(/Cloudinary configuration incomplete/);
+      } finally {
+        config.cloudinary.cloudName = orig;
+      }
     });
   });
 
