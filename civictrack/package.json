@@ -1,0 +1,29 @@
+{
+  "name": "civictrack",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CivicTrack — Smart Public Issue Reporting System",
+  "scripts": {
+    "dev:server": "npm --prefix server run dev",
+    "dev:server:memory": "npm --prefix server run dev:memory",
+    "dev:client": "npm --prefix client run dev",
+    "seed": "npm --prefix server run seed",
+    "migrate:cloudinary": "npm --prefix server run migrate:cloudinary",
+    "migrate:cloudinary:dry": "npm --prefix server run migrate:cloudinary:dry",
+    "test:server": "npm --prefix server test",
+    "test:client": "npm --prefix client test",
+    "test": "npm run test:server && npm run test:client",
+    "build:client": "npm --prefix client run build",
+    "build": "npm run build:client",
+    "start": "npm --prefix server start"
+  },
+  "keywords": [
+    "civic-tech",
+    "reporting",
+    "react",
+    "express",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "ISC"
+}

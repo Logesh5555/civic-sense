@@ -1,0 +1,11 @@
+{
+  "name": "civic-sense-root",
+  "private": true,
+  "scripts": {
+    "dev:server": "npm --prefix civictrack run dev:server",
+    "dev:server:memory": "npm --prefix civictrack run dev:server:memory",
+    "dev:client": "npm --prefix civictrack run dev:client",
+    "seed": "npm --prefix civictrack run seed",
+    "start": "npm --prefix civictrack start"
+  }
+}

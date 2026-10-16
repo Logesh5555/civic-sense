@@ -1,0 +1,182 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply antialiased selection:bg-teal-100 selection:text-teal-900;
+    background-color: #F8FAFC;
+    color: #0F172A;
+  }
+  body {
+    @apply min-h-screen font-sans bg-[#F8FAFC] text-[#0F172A] overflow-x-hidden;
+  }
+  :focus-visible {
+    outline: 2px solid #0D9488;
+    outline-offset: 2px;
+  }
+  h1, h2, h3, h4 {
+    color: #163B65;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-slate-200/80 bg-white shadow-card transition-all duration-300;
+  }
+  .card-interactive {
+    @apply card hover:shadow-card-hover hover:border-slate-300 hover:-translate-y-0.5;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  }
+  
+  /* Buttons with micro-interactions & feedback */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100 select-none;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+  .btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.97);
+  }
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-900 active:bg-primary-950;
+    box-shadow: 0 1px 3px 0 rgba(22, 59, 101, 0.2);
+  }
+  .btn-primary:hover:not(:disabled) {
+    box-shadow: 0 6px 14px -2px rgba(22, 59, 101, 0.35);
+  }
+  .btn-secondary {
+    @apply btn bg-secondary text-white hover:bg-secondary-700 active:bg-secondary-800;
+    box-shadow: 0 1px 3px 0 rgba(13, 148, 136, 0.2);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    box-shadow: 0 6px 14px -2px rgba(13, 148, 136, 0.35);
+  }
+  .btn-accent {
+    @apply btn bg-secondary text-white hover:bg-secondary-700 active:bg-secondary-800;
+    box-shadow: 0 1px 3px 0 rgba(13, 148, 136, 0.2);
+  }
+  .btn-accent:hover:not(:disabled) {
+    box-shadow: 0 6px 14px -2px rgba(13, 148, 136, 0.35);
+  }
+  .btn-outline {
+    @apply btn border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 shadow-sm;
+  }
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm;
+  }
+  .btn-danger:hover:not(:disabled) {
+    box-shadow: 0 6px 14px -2px rgba(239, 68, 68, 0.35);
+  }
+  .btn-ghost {
+    @apply btn text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 active:bg-slate-200;
+  }
+  .btn-ghost:hover:not(:disabled) {
+    transform: none;
+  }
+  
+  /* Form Inputs and Select Options with animated focus state */
+  .input {
+    @apply block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm disabled:bg-slate-50 disabled:text-slate-400;
+    transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+  }
+  .input:hover:not(:disabled):not(:focus) {
+    border-color: #94A3B8;
+  }
+  .input:focus {
+    outline: none;
+    border-color: #0D9488;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.18);
+  }
+  .input-error {
+    border-color: #EF4444 !important;
+  }
+  .input-error:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-600;
+  }
+  
+  /* Tables with smooth row transitions */
+  .th {
+    @apply px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 bg-slate-50/80;
+  }
+  .td {
+    @apply px-4 py-3.5 text-sm text-slate-700 transition-colors duration-200;
+  }
+  tbody tr {
+    @apply transition-colors duration-150;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full hover:bg-slate-300;
+}
+
+/* Leaflet integration */
+.leaflet-container {
+  font-family: inherit;
+  z-index: 0;
+}
+.ct-marker {
+  border-radius: 9999px;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ct-marker:hover {
+  transform: scale(1.25);
+}
+
+/* Skeleton Loading Shimmer */
+.skeleton {
+  @apply relative overflow-hidden rounded-xl bg-slate-200;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 1.6s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .skeleton::after {
+    display: none;
+  }
+}
