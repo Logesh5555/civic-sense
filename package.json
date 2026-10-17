@@ -9,6 +9,7 @@
   "scripts": {
     "build": "npm --prefix civictrack run build",
     "build:client": "npm --prefix civictrack/client run build",
+    "dev": "npm --prefix civictrack run dev",
     "dev:server": "npm --prefix civictrack run dev:server",
     "dev:server:memory": "npm --prefix civictrack run dev:server:memory",
     "dev:client": "npm --prefix civictrack run dev:client",
