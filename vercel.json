@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm --prefix civictrack/client run build",
+  "buildCommand": "npm run build:client",
   "outputDirectory": "civictrack/client/dist",
   "rewrites": [
     {
