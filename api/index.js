@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { createApp } from './civictrack/server/src/app.js';
-import { config } from './civictrack/server/src/config/index.js';
+import { createApp } from '../civictrack/server/src/app.js';
+import { config } from '../civictrack/server/src/config/index.js';
 
 let appInstance = null;
 
